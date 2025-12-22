@@ -18,12 +18,14 @@ spider = BaseSpider()
 
 def extract_images(html_content: str) -> list[str]:
     """从HTML中提取图片链接"""
+    pattern = r'https://mmbiz\.qpic\.cn/[^"\'<>\s\\]+(?:\?wx_fmt=[a-zA-Z]+)?'
+    matches = re.findall(pattern, html_content)
+
     images = []
-    parts = html_content.split('https://mmbiz.qpic.cn/')
-    for i in range(1, len(parts)):
-        image_url = 'https://mmbiz.qpic.cn/' + parts[i].split('"')[0]
-        if image_url not in images:
-            images.append(image_url)
+    for url in matches:
+        clean_url = url.split('\\')[0].rstrip('&')
+        if clean_url not in images:
+            images.append(clean_url)
     return images
 
 
