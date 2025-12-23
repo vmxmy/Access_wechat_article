@@ -20,6 +20,8 @@
 
 ### 快速开始
 
+#### 方式 A：使用 pip
+
 ```bash
 # 1. 安装依赖
 pip install -r requirements.txt
@@ -28,6 +30,34 @@ pip install -r requirements.txt
 uvicorn api.main:app --reload --port 8000
 
 # 3. 访问 API 文档
+# Swagger UI: http://localhost:8000/docs
+# ReDoc: http://localhost:8000/redoc
+```
+
+#### 方式 B：使用 uv（创建虚拟环境并启动）
+
+```bash
+# 0. 安装 uv（任选其一）
+pip install -U uv
+# 或（macOS / Linux）
+# brew install uv
+
+# 1. 创建虚拟环境（默认生成 .venv/）
+uv venv
+
+# 2. 激活虚拟环境
+# macOS / Linux:
+source .venv/bin/activate
+# Windows (PowerShell):
+# .\.venv\Scripts\Activate.ps1
+
+# 3. 安装依赖
+uv pip install -r requirements.txt
+
+# 4. 启动 API 服务
+uvicorn api.main:app --reload --port 8000
+
+# 5. 访问 API 文档
 # Swagger UI: http://localhost:8000/docs
 # ReDoc: http://localhost:8000/redoc
 ```
@@ -423,4 +453,3 @@ pip install -r requirements.txt
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=yeximm/Access_wechat_article&type=Date)](https://www.star-history.com/#yeximm/Access_wechat_article&Date)
-
