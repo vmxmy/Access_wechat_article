@@ -122,30 +122,46 @@ class BaseSpider:
 
         # 整理文章关键信息
         soup = BeautifulSoup(content, 'lxml')
-        self.nickname = soup.find("a", id="js_name").get_text().strip()  # 公众号名称  
-        author = soup.find("meta", {"name": "author"}).get("content").strip()  # 文章作者
-        article_link = soup.find("meta", property="og:url").get("content")  # 文章链接
-        article_title = soup.find("h1", id="activity-name").get_text().strip()  # 文章标题
+
+        # 公众号名称 (带空值检查)
+        nickname_element = soup.find("a", id="js_name")
+        self.nickname = nickname_element.get_text().strip() if nickname_element else ""
+
+        # 文章作者 (带空值检查)
+        author_meta = soup.find("meta", {"name": "author"})
+        author = author_meta.get("content", "").strip() if author_meta else ""
+
+        # 文章链接 (带空值检查)
+        link_meta = soup.find("meta", property="og:url")
+        article_link = link_meta.get("content", "") if link_meta else ""
+
+        # 文章标题 (带空值检查)
+        title_element = soup.find("h1", id="activity-name")
+        article_title = title_element.get_text().strip() if title_element else ""
         print('当前文章为>>>> ' + article_title)
 
         # 将文字内容转换为列表形式存储
         original_texts = soup.getText().split('\n')  # 将页面所有的文本内容提取，并转为列表形式
         format_texts = list(filter(lambda x: bool(x.strip()), original_texts))  # filter() 函数可以根据指定的函数对可迭代对象进行过滤
         
-        # 正则方式
-        createTime = re.search(r"var createTime = '(.*?)'.*", content).group(1)  # 文章创建时间
-        year, month, day = createTime.split(" ")[0].split("-")      # 年，月，日
-        hour, minute = createTime.split(" ")[1].split(":") 
-        
+        # 正则方式提取创建时间
+        createTime_match = re.search(r"var createTime = '(.*?)'.*", content)
+        createTime = createTime_match.group(1) if createTime_match else ""
+
         # 提取公众号biz值, 拼凑主页链接
-        appuin = re.search(r"var appuin = (.*?);", content).group(1)  # 公众号biz值
-        quoted_values = re.findall(r'["\']([^"\']*)["\']', appuin)
-        for value in quoted_values:
-            if value:
-                self.biz = value
+        appuin_match = re.search(r"var appuin = (.*?);", content)
+        if appuin_match:
+            appuin = appuin_match.group(1)
+            quoted_values = re.findall(r'["\']([^"\']*)["\']', appuin)
+            for value in quoted_values:
+                if value:
+                    self.biz = value
+        else:
+            self.biz = ""
+
         # 公众号主页链接
-        self.public_main_link = ('https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=' 
-                                 + self.biz + '&scene=124#wechat_redirect')
+        self.public_main_link = ('https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz='
+                                 + self.biz + '&scene=124#wechat_redirect') if self.biz else ""
         
         return {
             'nickname': self.nickname, 
